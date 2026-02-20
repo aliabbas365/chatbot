@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Attrition API UI</title>
+  <style>body{font-family:Arial;max-width:900px;margin:24px} textarea{width:100%;height:160px}</style>
+</head>
+<body>
+  <h2>Attrition API UI</h2>
+  <p>Use the sample JSON editor to send a single record or an array of records to the /predict endpoint.</p>
+
+  <button id="refreshFeatures">Load feature list</button>
+  <pre id="features" style="background:#f5f5f5;padding:8px;max-height:200px;overflow:auto"></pre>
+
+  <h3>Sample payload (edit as needed)</h3>
+  <textarea id="payload">[{"Age":35,"BusinessTravel":"Travel_Rarely","Department":"Research & Development","DistanceFromHome":5,"Education":3,"EnvironmentSatisfaction":3,"Gender":"Male","JobRole":"Research Scientist","MonthlyIncome":5000,"NumCompaniesWorked":1,"OverTime":"No","PercentSalaryHike":11,"StockOptionLevel":0,"TotalWorkingYears":10,"TrainingTimesLastYear":3,"WorkLifeBalance":2,"YearsAtCompany":5}]</textarea>
+
+  <p>
+    <button id="preview">Preview prepared features</button>
+    <button id="predict">Predict</button>
+  </p>
+
+  <h3>Response</h3>
+  <pre id="response" style="background:#f5f5f5;padding:8px;"></pre>
+
+<script>
+async function getJSON(path){ const r=await fetch(path); return r.json(); }
+document.getElementById('refreshFeatures').onclick = async ()=>{
+  const j = await getJSON('/features');
+  document.getElementById('features').textContent = JSON.stringify(j, null, 2);
+};
+document.getElementById('preview').onclick = async ()=>{
+  const t = document.getElementById('payload').value;
+  try{
+    const body = JSON.parse(t);
+    const r = await fetch('/preview', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+    const j = await r.json();
+    document.getElementById('response').textContent = JSON.stringify(j, null, 2);
+  }catch(e){ document.getElementById('response').textContent = 'Invalid JSON'; }
+};
+document.getElementById('predict').onclick = async ()=>{
+  const t = document.getElementById('payload').value;
+  try{
+    const body = JSON.parse(t);
+    const r = await fetch('/predict', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+    const j = await r.json();
+    document.getElementById('response').textContent = JSON.stringify(j, null, 2);
+  }catch(e){ document.getElementById('response').textContent = 'Invalid JSON'; }
+};
+</script>
+</body>
+</html>
